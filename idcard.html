@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="bn">
+  <head>
+    <meta charset="UTF-8" />
+    <title>হোমনা প্রিমিয়ার লীগ - ID Card</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <style>
+      body {
+        font-family: Arial, Helvetica, sans-serif;
+        background: #f2f2f2;
+        padding: 20px;
+      }
+
+      .id-card {
+        max-width: 520px;
+        background: #fff;
+        border: 2px solid #c62828;
+        margin: auto;
+      }
+
+      .header {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #c62828;
+        color: #fff;
+        padding: 10px;
+      }
+
+      .player-info {
+        text-align: center;
+      }
+
+      .player-info h1 {
+        font-size: 22px;
+        margin: 0;
+      }
+
+      .player-info p {
+        margin: 4px 0;
+        font-size: 13px;
+      }
+
+      .session {
+        background: yellow;
+        color: #000;
+        display: inline-block;
+        padding: 2px 6px;
+        font-weight: bold;
+      }
+
+      .content {
+        display: flex;
+        padding: 10px;
+        gap: 10px;
+      }
+
+      .details {
+        width: 65%;
+        font-size: 15px;
+      }
+
+      .details p {
+        margin: 8px 0;
+        font-weight: bold;
+      }
+
+      .details span.label {
+        display: inline-block;
+        width: 120px;
+      }
+
+      .photo {
+        width: 35%;
+        text-align: center;
+      }
+
+      .photo img {
+        width: 100%;
+        height: 100%;
+        border: 2px solid #333;
+        object-fit: cover;
+      }
+
+      .footer {
+        text-align: center;
+        padding: 6px;
+        font-weight: bold;
+        background: #c62828;
+        color: #ffffff;
+      }
+
+      @media print {
+        body {
+          background: #fff;
+          padding: 0;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="id-card">
+      <div class="header">
+        <div class="player-info">
+          <h1>🏏 হোমনা প্রিমিয়ার লীগ</h1>
+          <p class="session">হোমনা, কুমিল্লা</p>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="details">
+          <p><span class="label">নাম</span> : <span id="name">---</span></p>
+          <p>
+            <span class="label">নাম্বার</span> : <span id="phone">---</span>
+          </p>
+          <p><span class="label">বয়স</span> : <span id="age">---</span></p>
+          <p>
+            <span class="label">গ্রাম</span> : <span id="village">---</span>
+          </p>
+          <p>
+            <span class="label">প্লেয়ার ধরন</span> :
+            <span id="playerType">---</span>
+          </p>
+          <p>
+            <span class="label">ব্যাটিং স্টাইল</span> :
+            <span id="battingStyle">---</span>
+          </p>
+          <p>
+            <span class="label">বোলিং স্টাইল</span> :
+            <span id="bowlingStyle">---</span>
+          </p>
+        </div>
+
+        <div class="photo">
+          <img id="photo" src="" alt="Player Photo" />
+        </div>
+      </div>
+
+      <div class="footer">
+        <p>হোমনা আদর্শ উচ্চ বিদ্যালয় মাঠে</p>
+      </div>
+    </div>
+
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
+    <script>
+      const firebaseConfig = {
+        apiKey: "AIzaSyDBoV5YQcY4PfV2aDzK88NK-C5L0Ny01_k",
+        authDomain: "cricket-tournament-17441.firebaseapp.com",
+        projectId: "cricket-tournament-17441",
+      };
+
+      firebase.initializeApp(firebaseConfig);
+      const db = firebase.firestore();
+
+      // URL থেকে Firebase document ID নেওয়া
+      const params = new URLSearchParams(window.location.search);
+      const docId = params.get("id");
+
+      if (!docId) {
+        alert("❌ ID পাওয়া যায়নি");
+      } else {
+        db.collection("registrations")
+          .doc(docId)
+          .get()
+          .then((doc) => {
+            if (doc.exists) {
+              const d = doc.data();
+
+              document.getElementById("name").innerText = d.name;
+              document.getElementById("phone").innerText = d.phone;
+              document.getElementById("age").innerText = d.age;
+              document.getElementById("village").innerText = d.village;
+              document.getElementById("playerType").innerText = d.player_type;
+              document.getElementById("battingStyle").innerText =
+                d.batting_style || "-";
+              document.getElementById("bowlingStyle").innerText =
+                d.bowling_style || "-";
+              document.getElementById("photo").src = d.photo_url;
+            } else {
+              alert("❌ ডাটা পাওয়া যায়নি");
+            }
+          })
+          .catch((err) => {
+            console.error(err);
+            alert("❌ সমস্যা হয়েছে");
+          });
+      }
+    </script>
+  </body>
+</html>

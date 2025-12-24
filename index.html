@@ -1,265 +1,269 @@
 <!DOCTYPE html>
 <html lang="bn">
-   <head>
-      <meta charset="UTF-8" />
-      <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>হোমনা প্রিমিয়ার লীগ - রেজিস্ট্রেশন</title>
-      <style>
-         body {
-         margin: 0;
-         font-family: Arial, sans-serif;
-         background: #f2f2f2;
-         }
-         .banner {
-         background: linear-gradient(135deg, #0f9d58, #0b8043);
-         color: white;
-         padding: 30px 15px;
-         text-align: center;
-         }
-         .container {
-         max-width: 420px;
-         background: white;
-         margin: -20px auto 20px;
-         padding: 20px;
-         border-radius: 12px;
-         box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-         }
-         label {
-         display: block;
-         margin-top: 10px;
-         font-weight: bold;
-         }
-         input,
-         select,
-         button {
-         width: 100%;
-         padding: 9px;
-         margin-top: 5px;
-         border-radius: 6px;
-         border: 1px solid #ccc;
-         }
-         button {
-         margin-top: 15px;
-         background: #0f9d58;
-         color: white;
-         font-size: 16px;
-         border: none;
-         cursor: pointer;
-         }
-         .preview-box {
-         width: 100%;
-         height: 180px;
-         border: 2px dashed #0f9d58;
-         border-radius: 10px;
-         margin-top: 8px;
-         display: flex;
-         align-items: center;
-         justify-content: center;
-         overflow: hidden;
-         background: #f9f9f9;
-         position: relative;
-         }
-         .preview-box span {
-         color: #999;
-         position: absolute;
-         }
-         .preview-box img {
-         width: 100%;
-         height: 100%;
-         object-fit: contain;
-         display: none;
-         }
-         #msg {
-         text-align: center;
-         margin-top: 10px;
-         font-weight: bold;
-         }
-      </style>
-   </head>
-   <body>
-      <div class="banner">
-         <h1>🏏 হোমনা প্রিমিয়ার লীগ</h1>
-         <p>হোমনা, কুমিল্লা</p>
-      </div>
-      <div class="container">
-         <form id="regForm">
-            <label>প্লেয়ার ছবি</label>
-            <input type="file" id="photo" accept="image/*" required />
-            <div class="preview-box">
-               <span id="previewText">ছবি</span>
-               <img id="previewImg" />
-            </div>
-            <label>নাম</label>
-            <input type="text" id="name" required />
-            <label>নাম্বার</label>
-            <input type="text" id="phone" required />
-            <label>বয়স</label>
-            <input type="number" id="age" required />
-            <label>থানা</label>
-            <input type="text" value="হোমনা" disabled />
-            <label>গ্রাম</label>
-            <input type="text" id="village" required />
-            <label>প্লেয়ার ধরন</label>
-            <select id="playerType" required>
-               <option value="">সিলেক্ট করুন</option>
-               <option>ব্যাটসম্যান</option>
-               <option>বোলার</option>
-               <option>অলরাউন্ডার</option>
-            </select>
-            <label>ব্যাটিং স্টাইল</label>
-            <select id="battingStyle">
-               <option>ডান হাতি ব্যাটসম্যান</option>
-               <option>বাম হাতি ব্যাটসম্যান</option>
-            </select>
-            <label>বোলিং স্টাইল</label>
-            <select id="bowlingStyle">
-               <option>ডান হাতি বোলার</option>
-               <option>বাম হাতি বোলার</option>
-            </select>
-            <button type="submit">রেজিস্ট্রেশন করুন</button>
-         </form>
-         <p id="msg"></p>
-      </div>
-      <!-- Supabase -->
-      <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
-      <!-- Firebase -->
-      <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-      <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-      <script>
-         const playerType = document.getElementById("playerType");
-         const battingStyle = document.getElementById("battingStyle");
-         const bowlingStyle = document.getElementById("bowlingStyle");
-         
-         // শুরুতে দুটোই disable থাকবে
-         battingStyle.disabled = true;
-         bowlingStyle.disabled = true;
-         
-         playerType.addEventListener("change", () => {
-         const type = playerType.value;
-         
-         if (type === "ব্যাটসম্যান") {
-         	battingStyle.disabled = false;
-         	bowlingStyle.disabled = true;
-         	bowlingStyle.value = "";
-         }
-         else if (type === "বোলার") {
-         	battingStyle.disabled = true;
-         	bowlingStyle.disabled = false;
-         	battingStyle.value = "";
-         }
-         else if (type === "অলরাউন্ডার") {
-         	battingStyle.disabled = false;
-         	bowlingStyle.disabled = false;
-         }
-         else {
-         	battingStyle.disabled = true;
-         	bowlingStyle.disabled = true;
-         	battingStyle.value = "";
-         	bowlingStyle.value = "";
-         }
-         });
-           const supabaseUrl = "https://hbbjvvugkztfyudireqq.supabase.co";
-           const supabaseKey =
-             "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhiYmp2dnVna3p0Znl1ZGlyZXFxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU5Njg5NzgsImV4cCI6MjA4MTU0NDk3OH0.V8itypLUD7IVYZGFcfyJb0DLbb_bwCiBWv2gSCt28Qc"; // 🔐 keep anon key only
-           const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
-         
-           function sanitize(name) {
-             return name.replace(/[^a-zA-Z0-9._-]/g, "_");
-           }
-         
-           // Image preview
-           document.getElementById("photo").addEventListener("change", (e) => {
-             const file = e.target.files[0];
-             if (!file) return;
-         
-             document.getElementById("previewImg").src = URL.createObjectURL(file);
-             document.getElementById("previewImg").style.display = "block";
-             document.getElementById("previewText").style.display = "none";
-           });
-         
-           document
-             .getElementById("regForm")
-             .addEventListener("submit", async (e) => {
-               e.preventDefault();
-               const msg = document.getElementById("msg");
-               msg.style.color = "black";
-               msg.innerText = "⏳ আপলোড হচ্ছে...";
-         
-               const file = document.getElementById("photo").files[0];
-         
-               if (!file || !file.type.startsWith("image/")) {
-                 msg.innerText = "❌ সঠিক ছবি দিন";
-                 msg.style.color = "red";
-                 return;
-               }
-         
-               if (file.size > 2 * 1024 * 1024) {
-                 msg.innerText = "❌ ছবি 2MB এর নিচে হতে হবে";
-                 msg.style.color = "red";
-                 return;
-               }
-         
-               const fileName = Date.now() + "_" + sanitize(file.name);
-         
-               const { error: uploadError } = await supabaseClient.storage
-                 .from("players")
-                 .upload(fileName, file);
-         
-               if (uploadError) {
-                 msg.innerText = "❌ ছবি আপলোড ব্যর্থ";
-                 msg.style.color = "red";
-                 return;
-               }
-         
-               const { data } = supabaseClient.storage
-                 .from("players")
-                 .getPublicUrl(fileName);
-               // ---------------- Firebase ----------------
-               const firebaseConfig = {
-                 apiKey: "AIzaSyDBoV5YQcY4PfV2aDzK88NK-C5L0Ny01_k",
-                 authDomain: "cricket-tournament-17441.firebaseapp.com",
-                 projectId: "cricket-tournament-17441",
-                 storageBucket: "cricket-tournament-17441.firebasestorage.app",
-                 messagingSenderId: "39486616682",
-                 appId: "1:39486616682:web:f12a5eb36d1a6ae67d4613",
-                 measurementId: "G-K9HWFXP1CE",
-               };
-               firebase.initializeApp(firebaseConfig);
-               const db = firebase.firestore();
-         
-               const name = document.getElementById("name").value;
-               const phone = document.getElementById("phone").value;
-               const age = document.getElementById("age").value;
-               const village = document.getElementById("village").value;
-               const playerType = document.getElementById("playerType").value;
-               const battingStyle = document.getElementById("battingStyle").value;
-               const bowlingStyle = document.getElementById("bowlingStyle").value;
-         
-               // Save rest of data to Firebase
-               try {
-                 await db.collection("registrations").add({
-                   name: name,
-                   phone: phone,
-                   age: age,
-                   thana: "হোমনা",
-                   village: village,
-                   player_type: playerType,
-                   batting_style: battingStyle,
-                   bowling_style: bowlingStyle,
-                   photo_url: data.publicUrl,
-                   created_at: firebase.firestore.FieldValue.serverTimestamp(),
-                 });
-                 msg.innerText = "✅ রেজিস্ট্রেশন সফল হয়েছে";
-                 msg.style.color = "green";
-                 e.target.reset();
-                 previewImg.style.display = "none";
-                 previewText.style.display = "block";
-               } catch (err) {
-                 console.error(err);
-                 msg.innerText = "❌ রেজিস্ট্রেশন ব্যর্থ";
-                 msg.style.color = "red";
-               }
-             });
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>হোমনা প্রিমিয়ার লীগ - রেজিস্ট্রেশন</title>
+    <style>
+      body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background: #f2f2f2;
+      }
+      .banner {
+        background: linear-gradient(135deg, #0f9d58, #0b8043);
+        color: white;
+        padding: 30px 15px;
+        text-align: center;
+      }
+      .container {
+        max-width: 420px;
+        background: white;
+        margin: -20px auto 20px;
+        padding: 20px;
+        border-radius: 12px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      }
+      label {
+        display: block;
+        margin-top: 10px;
+        font-weight: bold;
+      }
+      input,
+      select,
+      button {
+        width: 100%;
+        padding: 9px;
+        margin-top: 5px;
+        border-radius: 6px;
+        border: 1px solid #ccc;
+      }
+      button {
+        margin-top: 15px;
+        background: #0f9d58;
+        color: white;
+        font-size: 16px;
+        border: none;
+        cursor: pointer;
+      }
+      .preview-box {
+        width: 100%;
+        height: 180px;
+        border: 2px dashed #0f9d58;
+        border-radius: 10px;
+        margin-top: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        background: #f9f9f9;
+        position: relative;
+      }
+      .preview-box span {
+        color: #999;
+        position: absolute;
+      }
+      .preview-box img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        display: none;
+      }
+      #msg {
+        text-align: center;
+        margin-top: 10px;
+        font-weight: bold;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="banner">
+      <h1>🏏 হোমনা প্রিমিয়ার লীগ</h1>
+      <p>হোমনা, কুমিল্লা</p>
+    </div>
+    <div class="container">
+      <form id="regForm">
+        <label>প্লেয়ার ছবি</label>
+        <input type="file" id="photo" accept="image/*" required />
+        <div class="preview-box">
+          <span id="previewText">ছবি</span>
+          <img id="previewImg" />
+        </div>
+        <label>নাম</label>
+        <input type="text" id="name" required />
+        <label>নাম্বার</label>
+        <input type="text" id="phone" required />
+        <label>বয়স</label>
+        <input type="number" id="age" required />
+        <label>থানা</label>
+        <input type="text" value="হোমনা" disabled />
+        <label>গ্রাম</label>
+        <input type="text" id="village" required />
+        <label>প্লেয়ার ধরন</label>
+        <select id="playerType" required>
+          <option value="">সিলেক্ট করুন</option>
+          <option>ব্যাটসম্যান</option>
+          <option>বোলার</option>
+          <option>অলরাউন্ডার</option>
+        </select>
+        <label>ব্যাটিং স্টাইল</label>
+        <select id="battingStyle">
+          <option>ডান হাতি ব্যাটসম্যান</option>
+          <option>বাম হাতি ব্যাটসম্যান</option>
+        </select>
+        <label>বোলিং স্টাইল</label>
+        <select id="bowlingStyle">
+          <option>ডান হাতি বোলার</option>
+          <option>বাম হাতি বোলার</option>
+        </select>
+        <button type="submit">রেজিস্ট্রেশন করুন</button>
+      </form>
+      <p id="msg"></p>
+    </div>
+    <!-- Supabase -->
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    <script>
+      const playerType = document.getElementById("playerType");
+      const battingStyle = document.getElementById("battingStyle");
+      const bowlingStyle = document.getElementById("bowlingStyle");
+
+      // শুরুতে দুটোই disable থাকবে
+      battingStyle.disabled = true;
+      bowlingStyle.disabled = true;
+
+      playerType.addEventListener("change", () => {
+        const type = playerType.value;
+
+        if (type === "ব্যাটসম্যান") {
+          battingStyle.disabled = false;
+          bowlingStyle.disabled = true;
+          bowlingStyle.value = "";
+        } else if (type === "বোলার") {
+          battingStyle.disabled = true;
+          bowlingStyle.disabled = false;
+          battingStyle.value = "";
+        } else if (type === "অলরাউন্ডার") {
+          battingStyle.disabled = false;
+          bowlingStyle.disabled = false;
+        } else {
+          battingStyle.disabled = true;
+          bowlingStyle.disabled = true;
+          battingStyle.value = "";
+          bowlingStyle.value = "";
+        }
+      });
+      const supabaseUrl = "https://hbbjvvugkztfyudireqq.supabase.co";
+      const supabaseKey =
+        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhiYmp2dnVna3p0Znl1ZGlyZXFxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU5Njg5NzgsImV4cCI6MjA4MTU0NDk3OH0.V8itypLUD7IVYZGFcfyJb0DLbb_bwCiBWv2gSCt28Qc"; // 🔐 keep anon key only
+      const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
+
+      function sanitize(name) {
+        return name.replace(/[^a-zA-Z0-9._-]/g, "_");
+      }
+
+      // Image preview
+      document.getElementById("photo").addEventListener("change", (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        document.getElementById("previewImg").src = URL.createObjectURL(file);
+        document.getElementById("previewImg").style.display = "block";
+        document.getElementById("previewText").style.display = "none";
+      });
+
+      document
+        .getElementById("regForm")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
+          const msg = document.getElementById("msg");
+          msg.style.color = "black";
+          msg.innerText = "⏳ আপলোড হচ্ছে...";
+
+          const file = document.getElementById("photo").files[0];
+
+          if (!file || !file.type.startsWith("image/")) {
+            msg.innerText = "❌ সঠিক ছবি দিন";
+            msg.style.color = "red";
+            return;
+          }
+
+          if (file.size > 2 * 1024 * 1024) {
+            msg.innerText = "❌ ছবি 2MB এর নিচে হতে হবে";
+            msg.style.color = "red";
+            return;
+          }
+
+          const fileName = Date.now() + "_" + sanitize(file.name);
+
+          const { error: uploadError } = await supabaseClient.storage
+            .from("players")
+            .upload(fileName, file);
+
+          if (uploadError) {
+            msg.innerText = "❌ ছবি আপলোড ব্যর্থ";
+            msg.style.color = "red";
+            return;
+          }
+
+          const { data } = supabaseClient.storage
+            .from("players")
+            .getPublicUrl(fileName);
+          // ---------------- Firebase ----------------
+          const firebaseConfig = {
+            apiKey: "AIzaSyDBoV5YQcY4PfV2aDzK88NK-C5L0Ny01_k",
+            authDomain: "cricket-tournament-17441.firebaseapp.com",
+            projectId: "cricket-tournament-17441",
+            storageBucket: "cricket-tournament-17441.firebasestorage.app",
+            messagingSenderId: "39486616682",
+            appId: "1:39486616682:web:f12a5eb36d1a6ae67d4613",
+            measurementId: "G-K9HWFXP1CE",
+          };
+          firebase.initializeApp(firebaseConfig);
+          const db = firebase.firestore();
+
+          const name = document.getElementById("name").value;
+          const phone = document.getElementById("phone").value;
+          const age = document.getElementById("age").value;
+          const village = document.getElementById("village").value;
+          const playerType = document.getElementById("playerType").value;
+          const battingStyle = document.getElementById("battingStyle").value;
+          const bowlingStyle = document.getElementById("bowlingStyle").value;
+
+          // Save rest of data to Firebase
+          try {
+            const docRef = await db.collection("registrations").add({
+              name: name,
+              phone: phone,
+              age: age,
+              thana: "হোমনা",
+              village: village,
+              player_type: playerType,
+              batting_style: battingStyle,
+              bowling_style: bowlingStyle,
+              photo_url: data.publicUrl,
+              created_at: firebase.firestore.FieldValue.serverTimestamp(),
+            });
+
+            msg.innerText = "✅ রেজিস্ট্রেশন সফল হয়েছে";
+            msg.style.color = "green";
+
+            // 👉 IDcard page এ পাঠানো
+            setTimeout(() => {
+              window.location.href = `idcard.html?id=${docRef.id}`;
+            }, 1000);
+
+            e.target.reset();
+            previewImg.style.display = "none";
+            previewText.style.display = "block";
+          } catch (err) {
+            console.error(err);
+            msg.innerText = "❌ রেজিস্ট্রেশন ব্যর্থ";
+            msg.style.color = "red";
+          }
+        });
     </script>
-   </body>
-  </html>
+  </body>
+</html>
