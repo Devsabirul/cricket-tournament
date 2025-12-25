@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>লগইন - হোমনা প্রিমিয়ার লীগ</title>
+<style>
+  /* Background */
+  body {
+    margin:0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    background: linear-gradient(135deg, #0f9d58, #34a853);
+  }
+
+  /* Card */
+  .login-card {
+    background: #fff;
+    padding: 40px 30px;
+    border-radius: 20px;
+    width: 350px;
+    box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+    text-align:center;
+  }
+
+  .login-card h2 {
+    margin-bottom: 25px;
+    color: #0b8043;
+  }
+
+  /* Inputs */
+  .login-card input {
+    width: 100%;
+    padding: 12px 15px;
+    margin: 10px 0;
+    border-radius: 10px;
+    border: 1px solid #ccc;
+    font-size: 15px;
+    transition: 0.3s;
+  }
+  .login-card input:focus {
+    border-color: #0f9d58;
+    outline: none;
+    box-shadow: 0 0 5px rgba(15,157,88,0.5);
+  }
+
+  /* Button */
+  .login-card button {
+    width: 100%;
+    padding: 12px;
+    margin-top: 15px;
+    border-radius: 10px;
+    border: none;
+    background: #0f9d58;
+    color: #fff;
+    font-size: 16px;
+    cursor: pointer;
+    transition: 0.3s;
+  }
+  .login-card button:hover {
+    background: #34a853;
+  }
+
+  /* Message */
+  #msg {
+    margin-top: 15px;
+    font-weight: bold;
+  }
+
+  /* Footer */
+  .footer {
+    margin-top: 20px;
+    font-size: 12px;
+    color: #555;
+  }
+
+  /* Optional: Signup link */
+  .signup-link {
+    margin-top: 15px;
+    display:block;
+    color:#0f9d58;
+    text-decoration:none;
+    font-weight:bold;
+    transition:0.3s;
+  }
+  .signup-link:hover {
+    text-decoration:underline;
+  }
+</style>
+</head>
+<body>
+
+<div class="login-card">
+  <h2>লগইন করুন</h2>
+  <input type="email" id="email" placeholder="ইমেইল" />
+  <input type="password" id="password" placeholder="পাসওয়ার্ড" />
+  <button id="loginBtn">লগইন</button>
+  <p id="msg"></p>
+</div>
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyDBoV5YQcY4PfV2aDzK88NK-C5L0Ny01_k",
+  authDomain: "cricket-tournament-17441.firebaseapp.com",
+  projectId: "cricket-tournament-17441",
+  storageBucket: "cricket-tournament-17441.firebasestorage.app",
+  messagingSenderId: "39486616682",
+  appId: "1:39486616682:web:f12a5eb36d1a6ae67d4613"
+};
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+
+document.getElementById("loginBtn").addEventListener("click", async ()=>{
+  const email = document.getElementById("email").value;
+  const password = document.getElementById("password").value;
+  const msg = document.getElementById("msg");
+  msg.style.color = "black"; msg.innerText = "⏳ লগইন হচ্ছে...";
+
+  try{
+    await auth.signInWithEmailAndPassword(email, password);
+    msg.style.color="green"; msg.innerText="✅ লগইন সফল, রেজিস্ট্রেশন পেজে যাচ্ছে...";
+    setTimeout(()=>{ window.location.href="index.html"; },1000);
+  }catch(e){
+    msg.style.color="red"; msg.innerText="❌ "+e.message;
+  }
+});
+</script>
+
+</body>
+</html>
